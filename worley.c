@@ -2,41 +2,41 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#define WIDTH 50
-#define HEIGHT 50
-#define SCREEN_WIDTH 500
-#define SCREEN_HEIGHT 500
+#include <math.h>
+#define SCREEN_WIDTH 800
+#define SCREEN_HEIGHT 800
 
 double grid[SCREEN_HEIGHT * SCREEN_WIDTH];
 
-int distance(x1, x2, y1, y2) { return (abs(x1 - x2) + abs(y1 - y2)); }
+int distance(x1, y1, x2, y2) { return sqrt((double) pow(x2 - x1, 2) + pow(y2 - y1, 2)); }
 int main() {
     srand(time(0));
-    rand();
-    rand();
-    rand();
+
+    const int featurePointLength = 100;
+    Vector2 featurePoints[featurePointLength];
+    for (int i = 0; i < featurePointLength; i++) {
+        featurePoints[i].x = rand() % SCREEN_WIDTH;
+        featurePoints[i].y = rand() % SCREEN_HEIGHT;
+    }
+
+    for (int i = 0; i < SCREEN_HEIGHT * SCREEN_WIDTH; i++) {
+        int lowestDistance = distance(i % SCREEN_WIDTH, i / SCREEN_HEIGHT, featurePoints[0].y, featurePoints[0].x);
+        for (int j = 0; j < featurePointLength; j++) {
+            if (distance(i % SCREEN_WIDTH, i / SCREEN_HEIGHT, featurePoints[j].y, featurePoints[j].x) < lowestDistance)
+                lowestDistance = distance(i % SCREEN_WIDTH, i / SCREEN_HEIGHT, featurePoints[j].y, featurePoints[j].x);
+        }
+        grid[i] = lowestDistance;
+    }
+
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Worley Noise Generator");
-    for (int i = 0; i < SCREEN_HEIGHT * SCREEN_WIDTH; i++) {
-        grid[i] = rand();
-    }
-
-    for (int i = 0; i < 8; i++) {
-        grid[rand() % SCREEN_WIDTH] = 1;
-        grid[rand() % SCREEN_HEIGHT] = 1;
-    }
-
-    for (int i = 0; i < SCREEN_HEIGHT * SCREEN_WIDTH; i++) {
-        printf("%d\n", rand() % 1);
-    }
-
     while (!WindowShouldClose()) {
 
-        for (int i = 0; i < SCREEN_HEIGHT * SCREEN_WIDTH; i++) {
-            Color color = {grid[i] * 255, grid[i] * 255, grid[i] * 255, 255};
-            DrawPixel(i % SCREEN_WIDTH, i / SCREEN_WIDTH, color);
-        }
         BeginDrawing();
         ClearBackground(WHITE);
+        for (int i = 0; i < SCREEN_HEIGHT * SCREEN_WIDTH; i++) {
+            Color color = {grid[i], grid[i], grid[i], 255};
+            DrawPixel(i / SCREEN_WIDTH, i % SCREEN_WIDTH, color);
+        }
         EndDrawing();
     }
 
