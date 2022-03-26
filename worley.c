@@ -8,26 +8,25 @@
 
 double grid[SCREEN_HEIGHT * SCREEN_WIDTH];
 
-int distance(x1, y1, x2, y2) { return sqrt((double) pow(x2 - x1, 2) + pow(y2 - y1, 2)); }
-int main() {
-    srand(time(0));
-
-    const int featurePointLength = 100;
-    Vector2 featurePoints[featurePointLength];
-    for (int i = 0; i < featurePointLength; i++) {
+int distance(x1, y1, x2, y2) { return sqrt((double) pow(x2 - x1, 2) + pow(y2 - y1, 2)); } // euclidean distance
+void generateNoise(int featurePointCount) {
+    Vector2 featurePoints[featurePointCount];
+    for (int i = 0; i < featurePointCount; i++) {
         featurePoints[i].x = rand() % SCREEN_WIDTH;
         featurePoints[i].y = rand() % SCREEN_HEIGHT;
     }
 
     for (int i = 0; i < SCREEN_HEIGHT * SCREEN_WIDTH; i++) {
-        int lowestDistance = distance(i % SCREEN_WIDTH, i / SCREEN_HEIGHT, featurePoints[0].y, featurePoints[0].x);
-        for (int j = 0; j < featurePointLength; j++) {
-            if (distance(i % SCREEN_WIDTH, i / SCREEN_HEIGHT, featurePoints[j].y, featurePoints[j].x) < lowestDistance)
-                lowestDistance = distance(i % SCREEN_WIDTH, i / SCREEN_HEIGHT, featurePoints[j].y, featurePoints[j].x);
+        int lowestDistance = distance(i % SCREEN_WIDTH, i / SCREEN_WIDTH, featurePoints[0].y, featurePoints[0].x);
+        for (int j = 0; j < featurePointCount; j++) {
+            if (distance(i % SCREEN_WIDTH, i / SCREEN_WIDTH, featurePoints[j].y, featurePoints[j].x) < lowestDistance)
+                lowestDistance = distance(i % SCREEN_WIDTH, i / SCREEN_WIDTH, featurePoints[j].y, featurePoints[j].x);
         }
         grid[i] = lowestDistance;
     }
-
+}
+int main() {
+    generateNoise(200);
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Worley Noise Generator");
     while (!WindowShouldClose()) {
 
